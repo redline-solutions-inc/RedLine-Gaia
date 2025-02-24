@@ -1,31 +1,25 @@
-﻿using Mapster;
+﻿using FluentResults;
+using Mapster;
 using MediatR;
 using RedLine_Gaia.Application.Features.Products.DTOs;
+using RedLine_Gaia.Application.ResultDto;
 using RedLine_Gaia.Domain.Entities;
 using RedLine_Gaia.Domain.Interfaces;
 
 namespace RedLine_Gaia.Application.Features.Products.Commands;
 
-public record CreateProductCommand(ProductDTO dto) : IRequest<int>;
+public record CreateProductCommand(ProductDTO dto) : IRequest<ResultDto<int>>;
 
-public class CreateProductCommandHandler
-    : IRequestHandler<CreateProductCommand, int>
+public class CreateProductCommandHandler(IProductRepository productRepository)
+    : IRequestHandler<CreateProductCommand, ResultDto<int>>
 {
-    private readonly IProductRepository _productRepository;
-
-    public CreateProductCommandHandler(IProductRepository productRepository)
-    {
-        _productRepository = productRepository;
-    }
-
-    public async Task<int> Handle(
+    public async Task<ResultDto<int>> Handle(
         CreateProductCommand request,
         CancellationToken cancellationToken
     )
     {
         var product = request.dto.Adapt<Product>();
-        var result = await _productRepository.Create(product);
-        return result;
-       
+        var result = await productRepository.Create(product);
+        return result.ToResultDto<int, int>();
     }
 }
