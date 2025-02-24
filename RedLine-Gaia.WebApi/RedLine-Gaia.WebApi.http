@@ -1,0 +1,6 @@
+@RedLine_Gaia.WebApi_HostAddress = http://localhost:5100
+
+GET {{RedLine_Gaia.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
