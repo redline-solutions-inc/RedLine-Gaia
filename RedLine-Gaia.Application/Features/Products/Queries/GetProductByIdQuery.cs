@@ -1,34 +1,25 @@
-﻿using Mapster;
+﻿using FluentResults;
+using Mapster;
 using MediatR;
 using RedLine_Gaia.Application.Features.Products.DTOs;
+using RedLine_Gaia.Application.ResultDto;
+using RedLine_Gaia.Domain.Entities;
 using RedLine_Gaia.Domain.Interfaces;
-
 
 namespace RedLine_Gaia.Application.Features.Products.Queries;
 
-public record GetProductByIdQuery(int id) : IRequest<ProductDTO?>;
+public record GetProductByIdQuery(int id) : IRequest<ResultDto<ProductDTO>>;
 
-public class GetProductByIdQueryHandler
-    : IRequestHandler<GetProductByIdQuery, ProductDTO?>
+public class GetProductByIdQueryHandler(IProductRepository productRepository)
+    : IRequestHandler<GetProductByIdQuery, ResultDto<ProductDTO>>
 {
-    private readonly IProductRepository _productRepository;
-
-    public GetProductByIdQueryHandler(
-        IProductRepository productRepository
-    )
-    {
-        _productRepository = productRepository;
-    }
-
-    public async Task<ProductDTO?> Handle(
+    public async Task<ResultDto<ProductDTO>> Handle(
         GetProductByIdQuery request,
         CancellationToken cancellation
     )
     {
-        var bulkReceipt = await _productRepository.GetProductById(
-            request.id
-        );
+        var result = await productRepository.GetProductById(request.id);
 
-        return bulkReceipt.Adapt<ProductDTO?>();
+        return result.ToResultDto<Product, ProductDTO>();
     }
 }

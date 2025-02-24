@@ -1,29 +1,36 @@
-﻿using RedLine_Gaia.Domain.Entities;
+﻿using FluentResults;
+using Microsoft.EntityFrameworkCore;
+using RedLine_Gaia.Domain.Entities;
+using RedLine_Gaia.Domain.Errors;
 using RedLine_Gaia.Domain.Interfaces;
 using RedLine_Gaia.Infrastructure.Database;
 
-
 namespace RedLine_Gaia.Infrastructure.Repositories;
 
-internal sealed class ProductRepository : IProductRepository
+internal sealed class ProductRepository(ApplicationDbContext context) : IProductRepository
 {
-    private readonly ApplicationDbContext _context;
-
-    public ProductRepository(ApplicationDbContext context)
+    public async Task<Result<int>> Create(Product product)
     {
-        _context = context;
+        try
+        {
+            context.Add<Product>(product);
+            var result = await context.SaveChangesAsync();
+
+            return Result.Ok(product.Id);
+        }
+        catch (Exception e)
+        {
+            return Result.Fail(new ProductCreateError());
+        }
     }
 
-    public async Task<int> Create(Product product)
+    public async Task<Result<Product>> GetProductById(int id)
     {
-        _context.Add<Product>(product);
-        var result = await _context.SaveChangesAsync();
+        var product = await context.Set<Product>().FirstOrDefaultAsync(x => x.Id == id);
 
-        return result;
-    }
+        if (product == null)
+            return Result.Fail(new ProductNotFoundError());
 
-    public async Task<Product?> GetProductById(int id)
-    {
-        return await _context.Set<Product>().FindAsync(id);
+        return Result.Ok(product);
     }
 }

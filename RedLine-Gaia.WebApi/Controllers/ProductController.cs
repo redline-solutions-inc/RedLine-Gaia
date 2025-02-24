@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RedLine_Gaia.Application.Features.Products.Commands;
 using RedLine_Gaia.Application.Features.Products.DTOs;
 using RedLine_Gaia.Application.Features.Products.Queries;
+using RedLine_Gaia.Application.ResultDto;
 
 namespace RedLine_Gaia.WebApi.Controllers
 {
@@ -18,20 +19,18 @@ namespace RedLine_Gaia.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ProductDTO>> CreateProduct(
-            CreateProductCommand command
-        )
+        public async Task<ResultDto<int>> CreateProduct(CreateProductCommand command)
         {
-            var dto = await _sender.Send(command);
-            return Ok(dto);
+            var result = await _sender.Send(command);
+            return result;
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetProductById(int id)
+        public async Task<ResultDto<ProductDTO>> GetProductById(int id)
         {
             var result = await _sender.Send(new GetProductByIdQuery(id));
 
-            return result is null ? NotFound() : Ok(result);
+            return result;
         }
     }
 }
