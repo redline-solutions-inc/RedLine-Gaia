@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace RedLine_Gaia.Application;
 
+/// <summary>
+/// Helper to quickly refrence the Application project Assembly.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public static class AssemblyReference
 {

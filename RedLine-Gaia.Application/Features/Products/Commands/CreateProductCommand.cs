@@ -9,8 +9,16 @@ using RedLine_Gaia.Domain.Interfaces;
 
 namespace RedLine_Gaia.Application.Features.Products.Commands;
 
+/// <summary>
+/// MediatR Command to Create a new Product
+/// </summary>
+/// <param name="dto">Product to be created</param>
 public record CreateProductCommand(ProductDTO dto) : IRequest<ResultDto<int>>;
 
+/// <summary>
+/// MediatR Command Handler for the CreateProductCommand;
+/// </summary>
+/// <param name="productRepository">Product Repository</param>
 public class CreateProductCommandHandler(IProductRepository productRepository)
     : IRequestHandler<CreateProductCommand, ResultDto<int>>
 {
