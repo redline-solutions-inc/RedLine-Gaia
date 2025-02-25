@@ -13,4 +13,5 @@ public interface IProductRepository
 {
     Task<Result<int>> Create(Product entity);
     Task<Result<Product>> GetProductById(int id);
+    Task<bool> IsProductNameUnique(Product entity);
 }
