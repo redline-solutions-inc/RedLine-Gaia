@@ -1,10 +1,12 @@
-﻿using Mapster;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace RedLine_Gaia.Application;
 
+[ExcludeFromCodeCoverage]
 public static class DependencyInjection
 {
     public static IServiceCollection AddApplicaiton(this IServiceCollection services)
