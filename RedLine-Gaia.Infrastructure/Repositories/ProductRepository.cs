@@ -24,19 +24,24 @@ internal sealed class ProductRepository(ApplicationDbContext context) : IProduct
         }
     }
 
-    public async Task<Result<Product>> GetProductById(int id)
+    public async Task<Product?> GetProductById(int id)
     {
-        var product = await context.Set<Product>().FirstOrDefaultAsync(x => x.Id == id);
+        return await context.Set<Product>().FirstOrDefaultAsync(x => x.Id == id);
+    }
 
-        if (product == null)
-            return Result.Fail(new ProductNotFoundError());
-
-        return Result.Ok(product);
+    public async Task<Result<List<Product>>> GetProductList()
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<bool> IsProductNameUnique(Product entity)
     {
         var product = await context.Set<Product>().FirstOrDefaultAsync(x => x.Name == entity.Name);
         return product is null;
+    }
+
+    public async Task<bool> UpdateProduct(Product entity)
+    {
+        throw new NotImplementedException();
     }
 }
