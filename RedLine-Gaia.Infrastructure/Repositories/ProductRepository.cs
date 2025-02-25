@@ -33,4 +33,10 @@ internal sealed class ProductRepository(ApplicationDbContext context) : IProduct
 
         return Result.Ok(product);
     }
+
+    public async Task<bool> IsProductNameUnique(Product entity)
+    {
+        var product = await context.Set<Product>().FirstOrDefaultAsync(x => x.Name == entity.Name);
+        return product is null;
+    }
 }

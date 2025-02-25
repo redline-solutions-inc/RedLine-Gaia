@@ -29,7 +29,6 @@ namespace RedLine_Gaia.WebApi.Controllers
         public async Task<ResultDto<ProductDTO>> GetProductById(int id)
         {
             var result = await _sender.Send(new GetProductByIdQuery(id));
-
             return result;
         }
     }
