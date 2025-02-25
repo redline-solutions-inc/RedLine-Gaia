@@ -1,7 +1,9 @@
-using System;
-
 namespace RedLine_Gaia.Application.ResultDto;
 
+/// <summary>
+/// A serializable return object wrapper for the FluentResults Result Object.
+/// <seealso href="https://github.com/altmann/FluentResults/tree/master/src/FluentResults.Samples/WebController">FluentResults Docs</seealso>
+/// </summary>
 public class ResultDto
 {
     public bool IsSuccess { get; set; }
@@ -15,6 +17,9 @@ public class ResultDto
     }
 }
 
+/// <summary>
+/// A typed serializable return object wrapper for the FluentResults Result Object.
+/// </summary>
 public class ResultDto<T> : ResultDto
 {
     public T? Data { get; set; }
@@ -26,6 +31,9 @@ public class ResultDto<T> : ResultDto
     }
 }
 
+/// <summary>
+/// A base error dto for the ResultDto.
+/// </summary>
 public class ErrorDto
 {
     public string Message { get; set; }

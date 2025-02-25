@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace RedLine_Gaia.Application;
 
+/// <summary>
+/// Helper to manage dependency inject in the Application project.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public static class DependencyInjection
 {

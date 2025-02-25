@@ -1,5 +1,8 @@
 ﻿namespace RedLine_Gaia.Application.Features.Products.DTOs;
 
+/// <summary>
+/// Base DTO for the Product.
+/// </summary>
 public class ProductDTO
 {
     public int? Id { get; set; }

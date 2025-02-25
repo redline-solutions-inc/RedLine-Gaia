@@ -1,9 +1,11 @@
-using System;
 using FluentResults;
 using Mapster;
 
 namespace RedLine_Gaia.Application.ResultDto;
 
+/// <summary>
+/// Extensions for the FluentResults to map to internal REsultDto object.
+/// </summary>
 public static class ResultDtoExtensions
 {
     public static ResultDto ToResultDto(this Result result)
