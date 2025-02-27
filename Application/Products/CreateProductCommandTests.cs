@@ -17,11 +17,13 @@ public class CreateProductCommandTests
     );
     private readonly CreateProductCommandHandler _handler;
     private readonly IProductRepository _productRepositoryMock;
+    private readonly IUnitOfWork _unitOfWorkMock;
 
     public CreateProductCommandTests()
     {
         _productRepositoryMock = Substitute.For<IProductRepository>();
-        _handler = new CreateProductCommandHandler(_productRepositoryMock);
+        _unitOfWorkMock = Substitute.For<IUnitOfWork>();
+        _handler = new CreateProductCommandHandler(_productRepositoryMock, _unitOfWorkMock);
     }
 
     [Fact]
@@ -87,7 +89,7 @@ public class CreateProductCommandTests
         _productRepositoryMock
             .IsProductNameUnique(Arg.Is<Product>(e => e.Name == Command.dto.Name))
             .Returns(true);
-        _productRepositoryMock.Create(Arg.Is<Product>(e => e.Name == Command.dto.Name)).Returns(1);
+        _productRepositoryMock.Add(Arg.Is<Product>(e => e.Name == Command.dto.Name));
 
         // Act
         ResultDto<int> result = await _handler.Handle(Command, default);
@@ -100,19 +102,15 @@ public class CreateProductCommandTests
     public async Task Handle_Should_CallRepositoryCreate_WhenProductNameIsUnique()
     {
         // Arrange
-        var savedProductId = 10;
         _productRepositoryMock
             .IsProductNameUnique(Arg.Is<Product>(e => e.Name == Command.dto.Name))
             .Returns(true);
-        _productRepositoryMock
-            .Create(Arg.Is<Product>(e => e.Name == Command.dto.Name))
-            .Returns(Result.Ok<int>(savedProductId));
+        _productRepositoryMock.Add(Arg.Is<Product>(e => e.Name == Command.dto.Name));
 
         // Act
         ResultDto<int> result = await _handler.Handle(Command, default);
 
         // Assert
-        await _productRepositoryMock.Received(1).Create(Arg.Any<Product>());
-        Assert.Equal(savedProductId, result.Data);
+        _productRepositoryMock.Received(1).Add(Arg.Any<Product>());
     }
 }

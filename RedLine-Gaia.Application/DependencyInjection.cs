@@ -16,9 +16,10 @@ public static class DependencyInjection
     {
         var assembly = typeof(DependencyInjection).Assembly;
 
-        services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(assembly));
-
-        //services.AddValidatorsFromAssembly(assembly);
+        services.AddMediatR(configuration =>
+        {
+            configuration.RegisterServicesFromAssembly(assembly);
+        });
 
         var config = TypeAdapterConfig.GlobalSettings;
         config.Scan(Assembly.GetExecutingAssembly());

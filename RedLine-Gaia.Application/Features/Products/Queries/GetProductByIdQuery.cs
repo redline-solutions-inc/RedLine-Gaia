@@ -1,7 +1,9 @@
-﻿using MediatR;
+﻿using FluentResults;
+using MediatR;
 using RedLine_Gaia.Application.Features.Products.DTOs;
 using RedLine_Gaia.Application.ResultDto;
 using RedLine_Gaia.Domain.Entities;
+using RedLine_Gaia.Domain.Errors;
 using RedLine_Gaia.Domain.Interfaces;
 
 namespace RedLine_Gaia.Application.Features.Products.Queries;
@@ -24,8 +26,15 @@ public class GetProductByIdQueryHandler(IProductRepository productRepository)
         CancellationToken cancellation
     )
     {
-        var result = await productRepository.GetProductById(request.id);
+        var product = await productRepository.GetById(request.id);
 
-        return result.ToResultDto<Product, ProductDTO>();
+        if (product is null)
+        {
+            return Result
+                .Fail<Product>(new ProductNotFoundError())
+                .ToResultDto<Product, ProductDTO>();
+        }
+
+        return Result.Ok(product).ToResultDto<Product, ProductDTO>();
     }
 }

@@ -1,42 +1,49 @@
-﻿using FluentResults;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RedLine_Gaia.Domain.Entities;
-using RedLine_Gaia.Domain.Errors;
 using RedLine_Gaia.Domain.Interfaces;
 using RedLine_Gaia.Infrastructure.Database;
 
 namespace RedLine_Gaia.Infrastructure.Repositories;
 
-internal sealed class ProductRepository(ApplicationDbContext context) : IProductRepository
+internal sealed class ProductRepository : IProductRepository
 {
-    public async Task<Result<int>> Create(Product product)
-    {
-        try
-        {
-            context.Add<Product>(product);
-            var result = await context.SaveChangesAsync();
+    private readonly ApplicationDbContext _context;
+    private readonly DbSet<Product> _dbSet;
 
-            return Result.Ok(product.Id);
-        }
-        catch (Exception e)
-        {
-            return Result.Fail(new ProductCreateError());
-        }
+    public ProductRepository(ApplicationDbContext context)
+    {
+        _context = context;
+        _dbSet = _context.Set<Product>();
     }
 
-    public async Task<Result<Product>> GetProductById(int id)
+    public void Add(Product entity)
     {
-        var product = await context.Set<Product>().FirstOrDefaultAsync(x => x.Id == id);
+        _dbSet.Add(entity);
+    }
 
-        if (product == null)
-            return Result.Fail(new ProductNotFoundError());
+    public async Task AddAsync(Product entity)
+    {
+        await _dbSet.AddAsync(entity);
+    }
 
-        return Result.Ok(product);
+    public void Update(Product entity)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Delete(Product entity)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<Product?> GetById(int id)
+    {
+        return await _dbSet.FindAsync(id);
     }
 
     public async Task<bool> IsProductNameUnique(Product entity)
     {
-        var product = await context.Set<Product>().FirstOrDefaultAsync(x => x.Name == entity.Name);
+        var product = await _dbSet.FirstOrDefaultAsync(x => x.Name == entity.Name);
         return product is null;
     }
 }
