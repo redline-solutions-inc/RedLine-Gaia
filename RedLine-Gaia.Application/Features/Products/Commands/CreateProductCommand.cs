@@ -19,8 +19,10 @@ public record CreateProductCommand(ProductDTO dto) : IRequest<ResultDto<int>>;
 /// MediatR Command Handler for the CreateProductCommand;
 /// </summary>
 /// <param name="productRepository">Product Repository</param>
-public class CreateProductCommandHandler(IProductRepository productRepository)
-    : IRequestHandler<CreateProductCommand, ResultDto<int>>
+public class CreateProductCommandHandler(
+    IProductRepository productRepository,
+    IUnitOfWork unitOfWork
+) : IRequestHandler<CreateProductCommand, ResultDto<int>>
 {
     public async Task<ResultDto<int>> Handle(
         CreateProductCommand request,
@@ -35,7 +37,10 @@ public class CreateProductCommandHandler(IProductRepository productRepository)
         if (!await productRepository.IsProductNameUnique(product))
             return Result.Fail<int>(new ProductNameMustBeUniqueError()).ToResultDto<int, int>();
 
-        var result = await productRepository.Create(product);
-        return result.ToResultDto<int, int>();
+        productRepository.Add(product);
+
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return Result.Ok(product.Id).ToResultDto<int, int>();
     }
 }

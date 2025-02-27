@@ -1,17 +1,19 @@
-using FluentAssertions;
-using FluentResults;
 using NSubstitute;
-using RedLine_Gaia.Application.Features.Products.Commands;
-using RedLine_Gaia.Application.Features.Products.DTOs;
-using RedLine_Gaia.Application.ResultDto;
-using RedLine_Gaia.Domain.Entities;
-using RedLine_Gaia.Domain.Errors;
 using RedLine_Gaia.Domain.Interfaces;
 
 namespace Application.Products;
 
 public class UpdateProductCommandTests
 {
+    private readonly IProductRepository _productRepositoryMock;
+    private readonly IUnitOfWork _unitOfWorkMock;
+
+    public UpdateProductCommandTests()
+    {
+        _productRepositoryMock = Substitute.For<IProductRepository>();
+        _unitOfWorkMock = Substitute.For<IUnitOfWork>();
+    }
+
     [Fact]
     public Task Handle_Should_ReturnError_WhenProductNotFound()
     {

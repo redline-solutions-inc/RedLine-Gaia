@@ -26,8 +26,8 @@ public class GetProductByIdQueryHandler(IProductRepository productRepository)
         CancellationToken cancellation
     )
     {
-        var result = await productRepository.GetProductById(request.id);
+        var product = await productRepository.GetById(request.id);
 
-        return Result.Ok(result).ToResultDto<Product, ProductDTO>();
+        return Result.Ok(product).ToResultDto<Product, ProductDTO>();
     }
 }

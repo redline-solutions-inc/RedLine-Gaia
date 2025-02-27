@@ -5,7 +5,6 @@ using NSubstitute.ReturnsExtensions;
 using RedLine_Gaia.Application.Features.Products.DTOs;
 using RedLine_Gaia.Application.Features.Products.Queries;
 using RedLine_Gaia.Application.ResultDto;
-using RedLine_Gaia.Domain.Entities;
 using RedLine_Gaia.Domain.Errors;
 using RedLine_Gaia.Domain.Interfaces;
 
@@ -28,7 +27,7 @@ public class GetProductByIdQueryTest
     {
         // Arrange
         var error = new ProductNotFoundError();
-        _productRepositoryMock.GetProductById(Arg.Is<int>(x => x == Query.id)).ReturnsNull();
+        _productRepositoryMock.GetById(Arg.Is<int>(x => x == Query.id)).ReturnsNull();
 
         // Act
         ResultDto<ProductDTO> result = await _handler.Handle(Query, default);
@@ -40,7 +39,5 @@ public class GetProductByIdQueryTest
     }
 
     [Fact]
-    public async Task Handle_Should_ReturnProduct_WhenCorrectProductIdGiven() { 
-        
-    }
+    public async Task Handle_Should_ReturnProduct_WhenCorrectProductIdGiven() { }
 }
