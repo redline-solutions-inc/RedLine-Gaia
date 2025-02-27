@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using FluentResults;
 using NSubstitute;
 using RedLine_Gaia.Application.Features.Products.Commands;
 using RedLine_Gaia.Application.Features.Products.DTOs;
