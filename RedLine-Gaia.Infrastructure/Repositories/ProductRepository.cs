@@ -10,9 +10,9 @@ internal sealed class ProductRepository : IProductRepository
     private readonly ApplicationDbContext _context;
     private readonly DbSet<Product> _dbSet;
 
-    public ProductRepository(ApplicationDbContext context)
+    public ProductRepository(IAppDbContextFactory<ApplicationDbContext> appDbContextFactory)
     {
-        _context = context;
+        _context = appDbContextFactory.dbContext();
         _dbSet = _context.Set<Product>();
     }
 
