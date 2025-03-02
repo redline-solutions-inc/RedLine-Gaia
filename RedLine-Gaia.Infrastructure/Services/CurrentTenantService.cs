@@ -16,17 +16,14 @@ public class CurrentTenantService : ICurrentTenantService
 
     public bool SetTenant(int tenantId)
     {
-        var connectionsString = _tenantService.GetConnectionString(tenantId);
-        if (connectionsString != null)
-        {
-            TenantId = tenantId;
-            ConnectionString = connectionsString;
-            return true;
-        }
-        else
-        {
-            // throw new Exception("Tenant invalid");
+        var connectionString = _tenantService.GetConnectionString(tenantId);
+
+        if (ConnectionString is null)
             return false;
-        }
+
+        TenantId = tenantId;
+        ConnectionString = connectionString;
+
+        return true;
     }
 }

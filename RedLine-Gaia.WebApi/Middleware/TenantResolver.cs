@@ -5,6 +5,9 @@ using RedLine_Gaia.Domain.Interfaces;
 
 namespace multiTenantApp.Middleware
 {
+    /// <summary>
+    /// Middleware responsible for setting the scoped Tenante information.
+    /// </summary>
     public class TenantResolver
     {
         private readonly RequestDelegate _next;

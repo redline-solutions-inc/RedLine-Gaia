@@ -9,21 +9,23 @@ var builder = new ConfigurationBuilder()
 
 IConfiguration config = builder.Build();
 
-var connectionString = config.GetValue<string>("MasterDBConnection");
+var masterDbConnectionString = config.GetValue<string>("MasterDBConnection");
 
-DbContextOptions<MasterDbContext> dbContextOptions = CreateDefaultDbContextOptions(
-    connectionString
+DbContextOptions<MasterDbContext> masterDbContextOptions = CreateMasterDbContextOptions(
+    masterDbConnectionString
 );
 
 try
 {
     Console.ForegroundColor = ConsoleColor.Blue;
     Console.WriteLine($"Applying MasterDbContext Migrations.");
-    using var context = new MasterDbContext(dbContextOptions);
-    await context.Database.MigrateAsync();
-    List<Tenant> tenants = context.Tenants.ToList();
-    // Console.ResetColor();
 
+    using var masterDbContext = new MasterDbContext(masterDbContextOptions);
+    await masterDbContext.Database.MigrateAsync();
+
+    Console.WriteLine($"Building multi-tenant connections.");
+
+    List<Tenant> tenants = masterDbContext.Tenants.ToList();
     IEnumerable<Task> tasks = tenants.Select(t => MigrateTenantDatabase(t));
     await Task.WhenAll(tasks);
 }
@@ -39,9 +41,7 @@ async Task MigrateTenantDatabase(Tenant tenant)
     );
     try
     {
-        // Console.ForegroundColor = ConsoleColor.Blue;
-        Console.WriteLine($"Applying ApplicationDB Migrations for '{tenant.Name}' tenant.");
-        // Console.ResetColor();
+        Console.WriteLine($"Applying Migrations for tenant: '{tenant.Name}'.");
         using var context = new ApplicationDbContext(dbContextOptions);
         await context.Database.MigrateAsync();
     }
@@ -54,5 +54,5 @@ async Task MigrateTenantDatabase(Tenant tenant)
 DbContextOptions<ApplicationDbContext> CreateTenantDbContextOptions(string connectionString) =>
     new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlServer(connectionString).Options;
 
-DbContextOptions<MasterDbContext> CreateDefaultDbContextOptions(string connectionString) =>
+DbContextOptions<MasterDbContext> CreateMasterDbContextOptions(string connectionString) =>
     new DbContextOptionsBuilder<MasterDbContext>().UseSqlServer(connectionString).Options;

@@ -21,7 +21,7 @@ public class TenantService(IServiceProvider serviceProvider) : ITenantService
         }
     }
 
-    public string GetConnectionString(int tenantId)
+    public string? GetConnectionString(int tenantId)
     {
         string connectionString = null;
 
