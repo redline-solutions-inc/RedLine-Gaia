@@ -25,7 +25,8 @@ public class CurrentTenantService : ICurrentTenantService
         }
         else
         {
-            throw new Exception("Tenant invalid");
+            // throw new Exception("Tenant invalid");
+            return false;
         }
     }
 }

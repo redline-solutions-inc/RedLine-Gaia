@@ -1,4 +1,7 @@
-﻿using RedLine_Gaia.Domain.Interfaces;
+﻿using FluentResults;
+using RedLine_Gaia.Application.ResultDto;
+using RedLine_Gaia.Domain.Errors;
+using RedLine_Gaia.Domain.Interfaces;
 
 namespace multiTenantApp.Middleware
 {
@@ -11,20 +14,40 @@ namespace multiTenantApp.Middleware
             _next = next;
         }
 
-        // Get Tenant Id from incoming requests
         public async Task InvokeAsync(
             HttpContext context,
             ICurrentTenantService currentTenantService
         )
         {
-            context.Request.Headers.TryGetValue("tenant", out var tenantFromHeader); // Tenant Id from incoming request header
-            if (string.IsNullOrEmpty(tenantFromHeader) == false)
+            try
             {
-                var tenantId = int.Parse(tenantFromHeader);
-                currentTenantService.SetTenant(tenantId);
-            }
+                context.Request.Headers.TryGetValue("tenantId", out var tenantFromHeader);
 
-            await _next(context);
+                if (string.IsNullOrEmpty(tenantFromHeader))
+                {
+                    await SetResponseErrorAsync(context.Response, new TenantNotInHeaderError());
+                    return;
+                }
+                else if (!currentTenantService.SetTenant(int.Parse(tenantFromHeader)))
+                {
+                    await SetResponseErrorAsync(context.Response, new TenantNotFoundError());
+                    return;
+                }
+
+                await _next(context);
+            }
+            catch (Exception ex)
+            {
+                await SetResponseErrorAsync(context.Response, new TenantNotFoundError());
+                return;
+            }
+        }
+
+        private async Task SetResponseErrorAsync(HttpResponse response, Error error)
+        {
+            response.ContentType = "application/json";
+            response.StatusCode = 404;
+            await response.WriteAsJsonAsync(Result.Fail(error).ToResultDto());
         }
     }
 }
