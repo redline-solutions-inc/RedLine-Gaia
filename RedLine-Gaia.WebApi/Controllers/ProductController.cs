@@ -11,26 +11,23 @@ namespace RedLine_Gaia.WebApi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ServiceFilter(typeof(TenantActionFilter))]
-    public class ProductController : ControllerBase
+    public class ProductController(ISender sender) : ControllerBase
     {
-        private readonly ISender _sender;
-
-        public ProductController(ISender sender)
-        {
-            _sender = sender;
-        }
-
-        [HttpPost]
+        [HttpPost(Name = "CreateProduct")]
+        [EndpointSummary("CreateProduct")]
+        [EndpointDescription("This endpoint creates a new Product.")]
         public async Task<ResultDto<int>> CreateProduct(CreateProductCommand command)
         {
-            var result = await _sender.Send(command);
+            var result = await sender.Send(command);
             return result;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}", Name = "GetProductById")]
+        [EndpointSummary("GetProductById")]
+        [EndpointDescription("This endpoint fetches a Product by a given Id.")]
         public async Task<ResultDto<ProductDTO>> GetProductById(int id)
         {
-            var result = await _sender.Send(new GetProductByIdQuery(id));
+            var result = await sender.Send(new GetProductByIdQuery(id));
             return result;
         }
     }
