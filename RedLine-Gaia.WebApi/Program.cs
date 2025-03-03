@@ -5,6 +5,7 @@ using RedLine_Gaia.Domain.Interfaces;
 using RedLine_Gaia.Infrastructure;
 using RedLine_Gaia.Infrastructure.Database;
 using RedLine_Gaia.Infrastructure.Services;
+using RedLine_Gaia.WebApi.Middleware;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,7 @@ builder.Services.AddDbContext<MasterDbContext>(options =>
 );
 
 builder.Services.AddApplicaiton().AddInfrastructure();
+builder.Services.AddScoped<TenantActionFilter>();
 
 var app = builder.Build();
 
@@ -37,7 +39,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
-app.UseMiddleware<TenantResolver>();
+
 app.MapControllers();
 
 app.Run();
