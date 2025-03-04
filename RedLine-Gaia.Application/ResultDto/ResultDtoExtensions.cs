@@ -21,8 +21,7 @@ public static class ResultDtoExtensions
     /// </summary>
     /// <typeparam name="T">The source Entity type</typeparam>
     /// <typeparam name="M">The destination DTO type</typeparam>
-    /// <param name="result">ResultDto that uses Mapster.Adapt to map <T> to <M></param>
-    /// <returns></returns>
+    /// <returns>ResultDto that uses Mapster.Adapt to map T to M</returns>
     public static ResultDto<M> ToResultDto<T, M>(this Result<T> result)
     {
         if (result.IsSuccess)
@@ -39,6 +38,11 @@ public static class ResultDtoExtensions
         );
     }
 
+    /// <summary>
+    /// Transforms a list of IErrors into an IEnumerable of ErrorDto
+    /// </summary>
+    /// <param name="errors"></param>
+    /// <returns></returns>
     private static IEnumerable<ErrorDto> TransformErrors(List<IError> errors)
     {
         return errors.Select(TransformError);

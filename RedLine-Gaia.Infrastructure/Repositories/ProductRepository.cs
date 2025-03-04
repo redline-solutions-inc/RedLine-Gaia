@@ -48,7 +48,7 @@ internal sealed class ProductRepository : IProductRepository
         return product is null;
     }
 
-    public Task<Result<List<Product>>> GetProductList()
+    public Task<List<Product>> GetProductList()
     {
         throw new NotImplementedException();
     }

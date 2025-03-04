@@ -5,5 +5,5 @@ namespace RedLine_Gaia.Domain.Interfaces;
 public interface IProductRepository : IRepository<Product>
 {
     Task<bool> IsProductNameUnique(Product entity);
-    Task<Result<List<Product>>> GetProductList();
+    Task<List<Product>> GetProductList();
 }

@@ -10,6 +10,10 @@ public class ResultDto
 
     public IEnumerable<ErrorDto> Errors { get; set; }
 
+    /// <summary>
+    /// A serializable return object wrapper for the FluentResults Result Object.
+    /// <seealso href="https://github.com/altmann/FluentResults/tree/master/src/FluentResults.Samples/WebController">FluentResults Docs</seealso>
+    /// </summary>
     public ResultDto(bool isSuccess, IEnumerable<ErrorDto> errors)
     {
         IsSuccess = isSuccess;
@@ -40,6 +44,9 @@ public class ErrorDto
 
     public string Code { get; set; }
 
+    /// <summary>
+    /// A base error dto for the ResultDto.
+    /// </summary>
     public ErrorDto(string message, string code)
     {
         Message = message;
