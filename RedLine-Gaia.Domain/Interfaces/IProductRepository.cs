@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using RedLine_Gaia.Domain.Entities;
+﻿using RedLine_Gaia.Domain.Entities;
 
 namespace RedLine_Gaia.Domain.Interfaces;
 

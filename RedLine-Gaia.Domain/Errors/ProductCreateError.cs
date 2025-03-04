@@ -1,8 +1,9 @@
-using System;
+using System.Diagnostics.CodeAnalysis;
 using FluentResults;
 
 namespace RedLine_Gaia.Domain.Errors;
 
+[ExcludeFromCodeCoverage]
 public class ProductCreateError : Error
 {
     public ProductCreateError()

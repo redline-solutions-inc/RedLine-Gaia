@@ -4,10 +4,10 @@ using FluentResults;
 namespace RedLine_Gaia.Domain.Errors;
 
 [ExcludeFromCodeCoverage]
-public class ProductNotFoundError : Error
+public class TenantNotInHeaderError : Error
 {
-    public ProductNotFoundError()
-        : base("Product not found")
+    public TenantNotInHeaderError()
+        : base("{tenantId} not found in header")
     {
         Metadata.Add("Code", 404);
     }
