@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using FluentValidation;
 using Mapster;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,7 @@ public static class DependencyInjection
         services.AddSingleton(config);
         services.AddScoped<IMapper, ServiceMapper>();
         services.AddMapster();
+        services.AddValidatorsFromAssembly(assembly);
         return services;
     }
 }
