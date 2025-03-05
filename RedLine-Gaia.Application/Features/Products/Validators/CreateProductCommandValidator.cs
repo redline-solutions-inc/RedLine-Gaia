@@ -1,4 +1,3 @@
-using System;
 using FluentValidation;
 using RedLine_Gaia.Application.Features.Products.Commands;
 
@@ -15,5 +14,7 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
             .WithMessage("Product name legth can not exceed 30 characters");
 
         RuleFor(p => p.dto.Price).NotEmpty().WithMessage("Price must be greater then zero");
+
+        RuleFor(p => p.dto.Price).GreaterThan(0).WithMessage("Price must be greater then zero");
     }
 }
