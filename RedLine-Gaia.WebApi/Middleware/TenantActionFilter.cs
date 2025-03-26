@@ -1,4 +1,5 @@
 using FluentResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using RedLine_Gaia.Application.ResultDto;
 using RedLine_Gaia.Domain.Errors;
@@ -17,28 +18,27 @@ public class TenantActionFilter(ICurrentTenantService currentTenantService) : IA
 
             if (string.IsNullOrEmpty(tenantFromHeader))
             {
-                SetResponseErrorAsync(context.HttpContext.Response, new TenantNotInHeaderError());
+                context.Result = new BadRequestObjectResult(
+                    Result.Fail(new TenantNotInHeaderError()).ToResultDto()
+                );
                 return;
             }
             else if (!currentTenantService.SetTenant(int.Parse(tenantFromHeader)))
             {
-                SetResponseErrorAsync(context.HttpContext.Response, new TenantNotFoundError());
+                context.Result = new BadRequestObjectResult(
+                    Result.Fail(new TenantNotFoundError()).ToResultDto()
+                );
                 return;
             }
         }
         catch (Exception ex)
         {
-            SetResponseErrorAsync(context.HttpContext.Response, new TenantNotFoundError());
+            context.Result = new BadRequestObjectResult(
+                Result.Fail(new TenantNotFoundError()).ToResultDto()
+            );
             return;
         }
     }
 
     public void OnActionExecuted(ActionExecutedContext context) { }
-
-    private void SetResponseErrorAsync(HttpResponse response, Error error)
-    {
-        response.ContentType = "application/json";
-        response.StatusCode = 404;
-        response.WriteAsJsonAsync(Result.Fail(error).ToResultDto());
-    }
 }
