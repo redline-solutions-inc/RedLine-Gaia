@@ -6,3 +6,14 @@ riderModule.iml
 .idea
 .vs
 .DS_Store
+MyProduce-Service/MyProduce-API.sln.DotSettings.user
+.vscode/tasks.json
+.vscode/launch.json
+.containers/
+.coveragereport/
+MyProduce-Service/TestResults/
+Partners-Service/TestResults/
+MyProduce-Service/coveragereport/
+coverage.cobertura.xml
+.vscode
+.cursor

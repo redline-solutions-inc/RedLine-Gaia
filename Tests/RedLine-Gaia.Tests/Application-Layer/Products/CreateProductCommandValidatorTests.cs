@@ -3,7 +3,7 @@ using RedLine_Gaia.Application.Features.Products.Commands;
 using RedLine_Gaia.Application.Features.Products.DTOs;
 using RedLine_Gaia.Application.Features.Products.Validators;
 
-namespace Application.Products;
+namespace RedLine_Gaia.Tests.Application_Layer.Products;
 
 public class CreateProductCommandValidatorTests
 {

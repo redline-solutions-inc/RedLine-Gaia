@@ -7,7 +7,7 @@ using RedLine_Gaia.Domain.Entities;
 using RedLine_Gaia.Domain.Errors;
 using RedLine_Gaia.Domain.Interfaces;
 
-namespace Application.Products;
+namespace RedLine_Gaia.Tests.Application_Layer.Products;
 
 public class CreateProductCommandTests
 {

@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>RedLine_Gaia.Tests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
@@ -23,11 +24,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RedLine-Gaia.Application\RedLine-Gaia.Application.csproj" />
+    <Using Include="Xunit" />
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit" />
+    <Folder Include="Infrastructure-Layer\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\RedLine-Gaia.Application\RedLine-Gaia.Application.csproj" />
+    <ProjectReference Include="..\..\RedLine-Gaia.Infrastructure\RedLine-Gaia.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
