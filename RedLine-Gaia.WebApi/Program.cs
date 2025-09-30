@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using multiTenantApp.Middleware;
 using RedLine_Gaia.Application;
 using RedLine_Gaia.Domain.Interfaces;
 using RedLine_Gaia.Infrastructure;
@@ -13,13 +12,80 @@ using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+ConfigureServices(builder);
+ConfigureLogging(builder);
+ConfigureDatabases(builder);
 
-var betterStackSourceToken = builder.Configuration.GetValue<string>("BetterStack:sourceToken");
-var betterStackEndpoint = builder.Configuration.GetValue<string>("BetterStack:betterStackEndpoint");
+var app = builder.Build();
 
-if (!string.IsNullOrEmpty(betterStackSourceToken) && !string.IsNullOrEmpty(betterStackEndpoint))
+ConfigureMiddleware(app, builder);
+ConfigureEndpoints(app);
+
+app.Run();
+
+/// <summary>
+/// Configures all application services and dependencies.
+/// </summary>
+static void ConfigureServices(WebApplicationBuilder builder)
+{
+    builder.Services.AddControllers();
+    builder.Services.AddOpenApi();
+
+    builder.Services.AddScoped<ICurrentTenantService, CurrentTenantService>();
+    builder.Services.AddScoped<TenantActionFilter>();
+
+    builder.Services.AddMediatR(configuration =>
+    {
+        configuration.RegisterServicesFromAssembly(
+            RedLine_Gaia.Application.AssemblyReference.Assembly
+        );
+    });
+
+    builder.Services.AddApplicaiton().AddInfrastructure();
+}
+
+/// <summary>
+/// Configures database contexts.
+/// </summary>
+static void ConfigureDatabases(WebApplicationBuilder builder)
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    );
+
+    builder.Services.AddDbContext<MasterDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("MasterDbConnection"))
+    );
+}
+
+/// <summary>
+/// Configures application logging.
+/// </summary>
+static void ConfigureLogging(WebApplicationBuilder builder)
+{
+    var betterStackSourceToken = builder.Configuration.GetValue<string>("BetterStack:sourceToken");
+    var betterStackEndpoint = builder.Configuration.GetValue<string>(
+        "BetterStack:betterStackEndpoint"
+    );
+
+    if (!string.IsNullOrEmpty(betterStackSourceToken) && !string.IsNullOrEmpty(betterStackEndpoint))
+    {
+        ConfigureBetterStackLogging(builder, betterStackSourceToken, betterStackEndpoint);
+    }
+    else
+    {
+        ConfigureConsoleLogging(builder);
+    }
+}
+
+/// <summary>
+/// Configures BetterStack logging.
+/// </summary>
+static void ConfigureBetterStackLogging(
+    WebApplicationBuilder builder,
+    string sourceToken,
+    string endpoint
+)
 {
     var levelSwitch = new LoggingLevelSwitch();
 
@@ -38,14 +104,15 @@ if (!string.IsNullOrEmpty(betterStackSourceToken) && !string.IsNullOrEmpty(bette
         {
             loggerConfiguration
                 .MinimumLevel.ControlledBy(levelSwitch)
-                .WriteTo.BetterStack(
-                    sourceToken: betterStackSourceToken,
-                    betterStackEndpoint: betterStackEndpoint
-                );
+                .WriteTo.BetterStack(sourceToken: sourceToken, betterStackEndpoint: endpoint);
         }
     );
 }
-else
+
+/// <summary>
+/// Configures console logging for development.
+/// </summary>
+static void ConfigureConsoleLogging(WebApplicationBuilder builder)
 {
     builder.Host.UseSerilog(
         (context, loggerConfiguration) =>
@@ -55,35 +122,27 @@ else
     );
 }
 
-builder.Services.AddScoped<ICurrentTenantService, CurrentTenantService>();
-
-builder.Services.AddMediatR(configuration =>
+/// <summary>
+/// Configures the middleware pipeline.
+/// </summary>
+static void ConfigureMiddleware(WebApplication app, WebApplicationBuilder builder)
 {
-    configuration.RegisterServicesFromAssembly(RedLine_Gaia.Application.AssemblyReference.Assembly);
-});
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-);
-builder.Services.AddDbContext<MasterDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MasterDbConnection"))
-);
+    if (app.Environment.IsDevelopment())
+    {
+        app.MapScalarApiReference();
+        app.MapOpenApi();
+    }
 
-builder.Services.AddApplicaiton().AddInfrastructure();
-builder.Services.AddScoped<TenantActionFilter>();
-
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.MapScalarApiReference();
-    app.MapOpenApi();
+    app.UseSerilogRequestLogging();
+    app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+    app.UseHttpsRedirection();
+    app.UseAuthorization();
 }
 
-app.UseSerilogRequestLogging();
-app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
-app.UseHttpsRedirection();
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+/// <summary>
+/// Configures endpoints.
+/// </summary>
+static void ConfigureEndpoints(WebApplication app)
+{
+    app.MapControllers();
+}

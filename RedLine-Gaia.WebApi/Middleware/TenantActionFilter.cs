@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -13,17 +14,33 @@ public class TenantActionFilter(ICurrentTenantService currentTenantService) : IA
     {
         try
         {
-            var request = context.HttpContext.Request;
-            request.Headers.TryGetValue("tenantId", out var tenantFromHeader);
+            var identity = context.HttpContext.User.Identity as ClaimsIdentity;
 
-            if (string.IsNullOrEmpty(tenantFromHeader))
+            if (identity is null)
             {
                 context.Result = new BadRequestObjectResult(
-                    Result.Fail(new TenantNotInHeaderError()).ToResultDto()
+                    Result.Fail(new MalformedTokenError()).ToResultDto()
                 );
                 return;
             }
-            else if (!currentTenantService.SetTenant(int.Parse(tenantFromHeader)))
+
+            IEnumerable<Claim> claims = identity.Claims;
+            var businessId = claims
+                .Where(x => x.Type == ClaimTypes.GroupSid)
+                .FirstOrDefault()
+                ?.Value;
+
+            var userId = claims.Where(x => x.Type == ClaimTypes.Name).FirstOrDefault()?.Value;
+            var locale = claims.Where(x => x.Type == ClaimTypes.Locality).FirstOrDefault()?.Value;
+
+            if (string.IsNullOrEmpty(businessId) || string.IsNullOrEmpty(userId))
+            {
+                context.Result = new BadRequestObjectResult(
+                    Result.Fail(new MalformedTokenError()).ToResultDto()
+                );
+                return;
+            }
+            else if (!currentTenantService.SetTenant(int.Parse(businessId), userId, locale))
             {
                 context.Result = new BadRequestObjectResult(
                     Result.Fail(new TenantNotFoundError()).ToResultDto()

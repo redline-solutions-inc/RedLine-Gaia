@@ -1,3 +1,5 @@
+using RedLine_Gaia.Domain.Models;
+
 namespace RedLine_Gaia.Domain.Interfaces;
 
 /// <summary>
@@ -7,5 +9,7 @@ public interface ICurrentTenantService
 {
     string? ConnectionString { get; set; }
     int? TenantId { get; set; }
-    bool SetTenant(int tenantId);
+    Locale Locale { get; set; }
+    Guid? UserId { get; set; }
+    bool SetTenant(int tenantId, string? userId, string? locale);
 }

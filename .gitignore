@@ -17,3 +17,4 @@ MyProduce-Service/coveragereport/
 coverage.cobertura.xml
 .vscode
 .cursor
+temp/

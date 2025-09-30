@@ -1,7 +1,9 @@
 using FluentValidation.TestHelper;
+using NSubstitute;
 using RedLine_Gaia.Application.Features.Products.Commands;
 using RedLine_Gaia.Application.Features.Products.DTOs;
 using RedLine_Gaia.Application.Features.Products.Validators;
+using RedLine_Gaia.Domain.Interfaces;
 
 namespace RedLine_Gaia.Tests.Application_Layer.Products;
 
@@ -19,8 +21,12 @@ public class CreateProductCommandValidatorTests
 
     public CreateProductCommandValidatorTests()
     {
-        _createProductValidator = new CreateProductCommandValidator();
+        _createProductValidator = new CreateProductCommandValidator(
+            Substitute.For<ICurrentTenantService>()
+        );
     }
+
+    private readonly ICurrentTenantService _currentTenantServiceMock;
 
     [Fact]
     public void Validator_Should_Pass_WhenProductHasAllCorrectValidation()

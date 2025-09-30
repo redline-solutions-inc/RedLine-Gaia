@@ -1,5 +1,6 @@
 using FluentResults;
 using Mapster;
+using RedLine_Gaia.Domain.Models;
 
 namespace RedLine_Gaia.Application.ResultDto;
 
@@ -39,16 +40,84 @@ public static class ResultDtoExtensions
         );
     }
 
-    private static IEnumerable<ErrorDto> TransformErrors(List<IError> errors)
+    public static IEnumerable<ErrorDto> TransformErrors(IEnumerable<IError> errors)
     {
         return errors.Select(TransformError);
     }
 
-    private static ErrorDto TransformError(IError error)
+    public static ErrorDto TransformError(IError error)
     {
         var key = TransformErrorKey(error);
 
-        return new ErrorDto(error.Message, key);
+        return new ErrorDto(error.Message, key ?? string.Empty);
+    }
+
+    /// <summary>
+    /// Converts a PaginationResult to a ResultDto with paginated data.
+    /// </summary>
+    /// <typeparam name="TEntity">The source entity type</typeparam>
+    /// <typeparam name="TDto">The destination DTO type</typeparam>
+    /// <param name="paginationResult">The pagination result to convert</param>
+    /// <returns>A ResultDto containing the paginated data</returns>
+    public static ResultDto<PaginationResult<TDto>> ToPaginatedResultDto<TEntity, TDto>(
+        this PaginationResult<TEntity> paginationResult
+    )
+    {
+        var mappedResults = paginationResult.Results.Adapt<IEnumerable<TDto>>();
+
+        var paginatedDto = new PaginationResult<TDto>
+        {
+            Page = paginationResult.Page,
+            PageSize = paginationResult.PageSize,
+            TotalPages = paginationResult.TotalPages,
+            TotalSize = paginationResult.TotalSize,
+            Results = mappedResults,
+        };
+
+        return new ResultDto<PaginationResult<TDto>>(
+            true,
+            Enumerable.Empty<ErrorDto>(),
+            paginatedDto
+        );
+    }
+
+    /// <summary>
+    /// Converts a Result containing PaginationResult to a ResultDto with paginated data.
+    /// </summary>
+    /// <typeparam name="TEntity">The source entity type</typeparam>
+    /// <typeparam name="TDto">The destination DTO type</typeparam>
+    /// <param name="result">The result containing pagination data to convert</param>
+    /// <returns>A ResultDto containing the paginated data</returns>
+    public static ResultDto<PaginationResult<TDto>> ToPaginatedResultDto<TEntity, TDto>(
+        this Result<PaginationResult<TEntity>> result
+    )
+    {
+        if (result.IsFailed)
+        {
+            return new ResultDto<PaginationResult<TDto>>(
+                false,
+                TransformErrors(result.Errors),
+                new PaginationResult<TDto>()
+            );
+        }
+
+        var paginationResult = result.Value;
+        var mappedResults = paginationResult.Results.Adapt<IEnumerable<TDto>>();
+
+        var paginatedDto = new PaginationResult<TDto>
+        {
+            Page = paginationResult.Page,
+            PageSize = paginationResult.PageSize,
+            TotalPages = paginationResult.TotalPages,
+            TotalSize = paginationResult.TotalSize,
+            Results = mappedResults,
+        };
+
+        return new ResultDto<PaginationResult<TDto>>(
+            true,
+            Enumerable.Empty<ErrorDto>(),
+            paginatedDto
+        );
     }
 
     private static string? TransformErrorKey(IError error)
